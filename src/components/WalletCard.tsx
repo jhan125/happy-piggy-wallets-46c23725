@@ -7,9 +7,20 @@ interface WalletCardProps {
   balance: number;
   budget: number;
   budgetProgress: number;
+  name: string;
+  last30Days: number;
+  last7Days: number;
 }
 
-export function WalletCard({ type, balance, budget, budgetProgress }: WalletCardProps) {
+export function WalletCard({
+  type,
+  balance,
+  budget,
+  budgetProgress,
+  name,
+  last30Days,
+  last7Days
+}: WalletCardProps) {
   const isPersonal = type === "personal";
   const borderColor = isPersonal ? "border-[#FEC6A1]" : "border-emerald-400";
   const iconColor = isPersonal ? "text-[#FEC6A1]" : "text-emerald-400";
@@ -18,7 +29,7 @@ export function WalletCard({ type, balance, budget, budgetProgress }: WalletCard
     <Card className={`p-6 border-2 ${borderColor} hover:shadow-lg transition-shadow`}>
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h3 className="text-xl font-semibold capitalize">{type}</h3>
+          <h3 className="text-xl font-semibold">{name}</h3>
           <p className="text-sm text-muted-foreground">Balance</p>
         </div>
         <PiggyBank className={`w-8 h-8 ${iconColor}`} />
@@ -26,6 +37,17 @@ export function WalletCard({ type, balance, budget, budgetProgress }: WalletCard
       
       <div className="mb-6">
         <span className="text-3xl font-bold">$ {balance.toLocaleString()}</span>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <p className="text-sm text-muted-foreground">Last 30 days</p>
+          <p className="font-medium">${last30Days.toLocaleString()}</p>
+        </div>
+        <div>
+          <p className="text-sm text-muted-foreground">Last 7 days</p>
+          <p className="font-medium">${last7Days.toLocaleString()}</p>
+        </div>
       </div>
       
       <div>

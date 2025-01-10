@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -24,21 +24,24 @@ export function BudgetManager({ budget, spent, onUpdateBudget }: BudgetManagerPr
   const isOverBudget = spent > budget;
   const isNearBudget = spent > budget * 0.8;
 
-  if (isNearBudget && !isOverBudget) {
-    toast({
-      title: "Budget Alert",
-      description: "You're approaching your budget limit!",
-      variant: "destructive",
-    });
-  }
+  // Move alerts to useEffect to prevent infinite re-renders
+  useEffect(() => {
+    if (isNearBudget && !isOverBudget) {
+      toast({
+        title: "Budget Alert",
+        description: "You're approaching your budget limit!",
+        variant: "destructive",
+      });
+    }
 
-  if (isOverBudget) {
-    toast({
-      title: "Budget Exceeded",
-      description: "You've exceeded your budget limit!",
-      variant: "destructive",
-    });
-  }
+    if (isOverBudget) {
+      toast({
+        title: "Budget Exceeded",
+        description: "You've exceeded your budget limit!",
+        variant: "destructive",
+      });
+    }
+  }, [isNearBudget, isOverBudget, toast]);
 
   const handleSave = () => {
     const budgetValue = parseFloat(newBudget);
@@ -131,8 +134,7 @@ export function BudgetManager({ budget, spent, onUpdateBudget }: BudgetManagerPr
             </div>
             <Progress 
               value={Math.min(progress, 100)} 
-              className="h-3"
-              indicatorClassName={isOverBudget ? "bg-destructive" : ""}
+              className={`h-3 ${isOverBudget ? "bg-destructive/20" : ""}`}
             />
           </div>
         </div>

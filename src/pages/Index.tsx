@@ -39,7 +39,7 @@ export default function Index() {
     // Initialize default wallets if none exist
     const storedWallets = localStorage.getItem("wallets");
     if (!storedWallets) {
-      const defaultWallets = [
+      const defaultWallets: Wallet[] = [
         {
           id: 1,
           name: "Personal",

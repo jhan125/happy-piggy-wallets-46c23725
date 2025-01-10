@@ -1,5 +1,8 @@
 import { Card } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { categories } from "./ExpenseCategories";
+import { ExpenseOverview } from "./ExpenseOverview";
+import { format } from "date-fns";
 
 interface Transaction {
   id: string;
@@ -25,25 +28,11 @@ interface WalletData {
 
 interface WalletStatsProps {
   wallet: WalletData;
+  onEditTransaction?: (transaction: Transaction) => void;
+  onDeleteTransaction?: (transactionId: string) => void;
 }
 
-const COLORS = ["#4ade80", "#f43f5e", "#fbbf24", "#60a5fa", "#a78bfa", "#f472b6"];
-
-export function WalletStats({ wallet }: WalletStatsProps) {
-  const categoryData = wallet.transactions?.reduce((acc: any, transaction) => {
-    const category = transaction.category || "Other";
-    if (!acc[category]) {
-      acc[category] = 0;
-    }
-    acc[category] += transaction.amount;
-    return acc;
-  }, {});
-
-  const pieData = Object.entries(categoryData || {}).map(([name, value]) => ({
-    name,
-    value,
-  }));
-
+export function WalletStats({ wallet, onEditTransaction, onDeleteTransaction }: WalletStatsProps) {
   const barData = wallet.transactions?.reduce((acc: any[], transaction) => {
     const date = new Date(transaction.date).toLocaleDateString();
     const existingDay = acc.find((day) => day.date === date);
@@ -96,41 +85,45 @@ export function WalletStats({ wallet }: WalletStatsProps) {
         </div>
       </Card>
 
+      <ExpenseOverview transactions={wallet.transactions} />
+
       <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Expense by Category</h3>
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={pieData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                fill="#8884d8"
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="flex flex-wrap justify-center gap-4 mt-4">
-          {pieData.map((entry, index) => (
-            <div key={entry.name} className="flex items-center gap-2">
+        <h3 className="text-lg font-semibold mb-4">Recent Transactions</h3>
+        <div className="space-y-4">
+          {wallet.transactions.map((transaction) => {
+            const category = categories.find(c => c.id === transaction.category);
+            return (
               <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: COLORS[index % COLORS.length] }}
-              />
-              <span className="text-sm">
-                {entry.name}: ${entry.value.toLocaleString()}
-              </span>
-            </div>
-          ))}
+                key={transaction.id}
+                className="flex items-center justify-between p-4 rounded-lg border hover:border-primary/50 cursor-pointer"
+                onClick={() => onEditTransaction?.(transaction)}
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center"
+                    style={{ 
+                      backgroundColor: category?.color + "20", 
+                      color: category?.color 
+                    }}
+                  >
+                    {category?.icon}
+                  </div>
+                  <div>
+                    <p className="font-medium">{transaction.merchant}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {format(new Date(transaction.date), "MMM d, yyyy")}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className={transaction.type === "expense" ? "text-destructive" : "text-green-500"}>
+                    {transaction.type === "expense" ? "-" : "+"}${transaction.amount.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{category?.name}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </Card>
     </div>

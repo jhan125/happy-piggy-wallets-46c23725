@@ -1,17 +1,54 @@
 import { Card } from "./ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { categories } from "./ExpenseCategories";
 
-const data = [
-  { name: "Category 1", value: 70 },
-  { name: "Category 2", value: 30 },
-];
+interface Transaction {
+  id: string;
+  type: "expense" | "income";
+  amount: number;
+  category: string;
+  date: string;
+  merchant: string;
+}
 
-const COLORS = ["#FEC6A1", "#4ade80"];
+interface ExpenseOverviewProps {
+  transactions: Transaction[];
+}
 
-export function ExpenseOverview() {
-  return (
-    <Card className="p-6">
-      <h2 className="text-xl font-semibold mb-6">Expense Overview</h2>
+export function ExpenseOverview({ transactions }: ExpenseOverviewProps) {
+  const expenseData = transactions
+    .filter(t => t.type === "expense")
+    .reduce((acc: { name: string; value: number }[], transaction) => {
+      const category = categories.find(c => c.id === transaction.category);
+      const existingCategory = acc.find(item => item.name === category?.name);
+      
+      if (existingCategory) {
+        existingCategory.value += transaction.amount;
+      } else if (category) {
+        acc.push({ name: category.name, value: transaction.amount });
+      }
+      
+      return acc;
+    }, []);
+
+  const incomeData = transactions
+    .filter(t => t.type === "income")
+    .reduce((acc: { name: string; value: number }[], transaction) => {
+      const category = categories.find(c => c.id === transaction.category);
+      const existingCategory = acc.find(item => item.name === category?.name);
+      
+      if (existingCategory) {
+        existingCategory.value += transaction.amount;
+      } else if (category) {
+        acc.push({ name: category.name, value: transaction.amount });
+      }
+      
+      return acc;
+    }, []);
+
+  const renderPieChart = (data: { name: string; value: number }[], title: string) => (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">{title}</h3>
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -25,20 +62,32 @@ export function ExpenseOverview() {
               paddingAngle={5}
               dataKey="value"
             >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
+              {data.map((entry, index) => {
+                const category = categories.find(c => c.name === entry.name);
+                return (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={category?.color || "#94a3b8"} 
+                  />
+                );
+              })}
             </Pie>
+            <Tooltip 
+              formatter={(value: number) => `$${value.toLocaleString()}`}
+            />
+            <Legend />
           </PieChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex justify-center gap-4 mt-4">
-        {data.map((entry, index) => (
-          <div key={entry.name} className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
-            <span className="text-sm">{entry.name}</span>
-          </div>
-        ))}
+    </div>
+  );
+
+  return (
+    <Card className="p-6">
+      <h2 className="text-xl font-semibold mb-6">Expense Overview</h2>
+      <div className="grid md:grid-cols-2 gap-8">
+        {renderPieChart(incomeData, "Income Distribution")}
+        {renderPieChart(expenseData, "Expense Distribution")}
       </div>
     </Card>
   );

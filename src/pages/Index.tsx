@@ -16,6 +16,16 @@ interface Wallet {
   budgetProgress: number;
   last30Days: number;
   last7Days: number;
+  transactions?: Transaction[];
+}
+
+interface Transaction {
+  id: string;
+  type: "expense" | "income";
+  amount: number;
+  category: string;
+  date: string;
+  merchant: string;
 }
 
 export default function Index() {
@@ -38,7 +48,25 @@ export default function Index() {
           budget: 3000,
           budgetProgress: 83,
           last30Days: 2000,
-          last7Days: 500
+          last7Days: 500,
+          transactions: [
+            {
+              id: "1",
+              type: "income",
+              amount: 3000,
+              category: "salary",
+              date: new Date().toISOString(),
+              merchant: "Company Inc"
+            },
+            {
+              id: "2",
+              type: "expense",
+              amount: 500,
+              category: "food",
+              date: new Date().toISOString(),
+              merchant: "Grocery Store"
+            }
+          ]
         },
         {
           id: 2,
@@ -48,7 +76,25 @@ export default function Index() {
           budget: 8000,
           budgetProgress: 63,
           last30Days: 3000,
-          last7Days: 1000
+          last7Days: 1000,
+          transactions: [
+            {
+              id: "3",
+              type: "income",
+              amount: 6000,
+              category: "sales",
+              date: new Date().toISOString(),
+              merchant: "Client A"
+            },
+            {
+              id: "4",
+              type: "expense",
+              amount: 1000,
+              category: "office",
+              date: new Date().toISOString(),
+              merchant: "Office Supplies Co"
+            }
+          ]
         }
       ];
       localStorage.setItem("wallets", JSON.stringify(defaultWallets));
@@ -68,6 +114,11 @@ export default function Index() {
     setTotal30Days(days30Total);
     setTotal7Days(days7Total);
   }, [wallets]);
+
+  // Combine all transactions from all wallets
+  const allTransactions = wallets.reduce((acc, wallet) => {
+    return [...acc, ...(wallet.transactions || [])];
+  }, [] as Transaction[]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -124,7 +175,7 @@ export default function Index() {
         </Button>
       </div>
 
-      <ExpenseOverview />
+      <ExpenseOverview transactions={allTransactions} />
     </div>
   );
 }

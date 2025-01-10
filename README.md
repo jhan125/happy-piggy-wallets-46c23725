@@ -1,8 +1,8 @@
-# Welcome to your Lovable project
+# PiggyPlot - Personal Finance Tracker
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/635cd939-df86-4966-8b64-c4f2f852054e
+**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
 
 ## How can I edit this code?
 
@@ -10,7 +10,7 @@ There are several ways of editing your application.
 
 **Use Lovable**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/635cd939-df86-4966-8b64-c4f2f852054e) and start prompting.
+Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
 
 Changes made via Lovable will be committed automatically to this repo.
 
@@ -52,17 +52,18 @@ npm run dev
 
 ## What technologies are used for this project?
 
-This project is built with .
+This project is built with React, Vite, TypeScript, and Tailwind CSS. It uses shadcn/ui for the component library and recharts for data visualization.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Key features:
+- Modern React with TypeScript for type safety
+- Tailwind CSS for styling
+- shadcn/ui for beautiful, accessible components
+- Recharts for interactive charts
+- Responsive design for all devices
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/635cd939-df86-4966-8b64-c4f2f852054e) and click on Share -> Publish.
+Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
 
 ## I want to use a custom domain - is that possible?
 

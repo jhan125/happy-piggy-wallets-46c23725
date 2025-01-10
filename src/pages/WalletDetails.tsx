@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ExpenseCategories } from "@/components/ExpenseCategories";
 import { WalletStats } from "@/components/WalletStats";
+import { BudgetManager } from "@/components/BudgetManager";
 
 interface Transaction {
   id: string;
@@ -91,6 +92,24 @@ export default function WalletDetails() {
     setTransactionType("expense");
   };
 
+  const handleUpdateBudget = (newBudget: number, period: "weekly" | "monthly") => {
+    if (!wallet) return;
+
+    const updatedWallet = {
+      ...wallet,
+      budget: newBudget,
+      budgetPeriod: period
+    };
+
+    const wallets = JSON.parse(localStorage.getItem("wallets") || "[]");
+    const updatedWallets = wallets.map((w: WalletData) =>
+      w.id === wallet.id ? updatedWallet : w
+    );
+
+    localStorage.setItem("wallets", JSON.stringify(updatedWallets));
+    setWallet(updatedWallet);
+  };
+
   if (!wallet) {
     return <div>Wallet not found</div>;
   }
@@ -115,22 +134,13 @@ export default function WalletDetails() {
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-primary/10 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-muted-foreground">Total Balance</h3>
-            <p className="text-2xl font-bold">${wallet.balance.toLocaleString()}</p>
-          </div>
-          
-          <div className="bg-primary/10 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-muted-foreground">Last 30 Days</h3>
-            <p className="text-2xl font-bold">${wallet.last30Days.toLocaleString()}</p>
-          </div>
-          
-          <div className="bg-primary/10 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-muted-foreground">Last 7 Days</h3>
-            <p className="text-2xl font-bold">${wallet.last7Days.toLocaleString()}</p>
-          </div>
-        </div>
+        <BudgetManager
+          budget={wallet.budget}
+          spent={wallet.transactions
+            .filter(t => t.type === "expense")
+            .reduce((sum, t) => sum + t.amount, 0)}
+          onUpdateBudget={handleUpdateBudget}
+        />
 
         {showAddTransaction ? (
           <Card className="p-6 mb-8">
